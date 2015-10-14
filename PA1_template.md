@@ -1,11 +1,6 @@
----
-title: "Reproducible Research - Peer Assessment 1"
-author: "ofcoursera"
-date: "14 October 2015"
-output:
-    html_document:
-        keep_md: yes
----
+# Reproducible Research - Peer Assessment 1
+ofcoursera  
+14 October 2015  
 
 ## Introduction
 
@@ -83,7 +78,8 @@ install.packages("lattice")
 
 Load libraries.
 
-```{r load_library, cache=FALSE}
+
+```r
 # load libraries  
 library(knitr)
 library(rmarkdown)
@@ -92,14 +88,16 @@ library(lattice)
 
 Set global variables.
 
-```{r setoptions, echo=TRUE} 
+
+```r
 # Global variables
 opts_chunk$set(echo=TRUE, fig.align="center", dev.args=list(bg=rgb(0.95, 0.95, 0.96, 0.8)))
 ```
 
 Define functions to format output for reporting.
 
-```{r fmt_interval_fun, cache=TRUE}
+
+```r
 # define function to format intervals to 24-hour time
 fmt_interval <-function(x){
     n <- nchar(x)
@@ -111,14 +109,16 @@ fmt_interval <-function(x){
 }
 ```
 
-```{r fmt_big, cache=TRUE}
+
+```r
 # define function to round and insert commas for reporting 
 fmt_rounded_big_mark <- function(x){
     format(round(x,0), big.mark=",", scientific=FALSE)
 }
 ```
 
-```{r fmt_pc, cache=TRUE}
+
+```r
 # define function to calculate and round percentage for reporting 
 fmt_rounded_pc <- function(dividend, divisor, diff=FALSE, digits=0, sci=FALSE){
     pc <- (dividend / divisor) * 100
@@ -130,7 +130,8 @@ fmt_rounded_pc <- function(dividend, divisor, diff=FALSE, digits=0, sci=FALSE){
 
 Read in activity dataset using class "csvDate" to specify date format. 
 
-```{r read_data, cache=TRUE}
+
+```r
 # Set import date format
 setClass("csvDate")
 setAs("character","csvDate", function(from) as.Date(from, format="%Y-%m-%d") )
@@ -142,7 +143,13 @@ if (!file.exists("activity.csv")) {
     else
         { unzip("repdata_data_activity.zip", files = "activity.csv", unzip = getOption("unzip")) }
 }
+```
 
+```
+## arguments 'minimized' and 'invisible' are for Windows only
+```
+
+```r
 # Read in data  
 activity <- read.csv("activity.csv", header=TRUE, colClasses = c("integer","csvDate","integer"))
 ```
@@ -156,7 +163,8 @@ activity <- read.csv("activity.csv", header=TRUE, colClasses = c("integer","csvD
 
 The total number of steps taken per day were calculated by summing steps aggregated by date, whilst excluding groups where all data entries for steps taken were NA.
 
-```{r aggregate_original, cache=TRUE}
+
+```r
 # Aggregate the total number of steps taken by date
 # excluding groups where all returns are NA
 stepsTot <- aggregate(steps ~ date, data=activity, FUN=sum, na.rm=TRUE, na.action = na.omit)
@@ -170,7 +178,8 @@ A histogram plot of the total number of steps taken per day was generated using 
 <!-- comment: Add hyper link) --> 
 <a name="Figure 1"></a>
 
-```{r histogram_1, cache=TRUE}
+
+```r
 # generate histogram plot and store 
 h1x <- "Number of Steps"
 h1y <-"Frequency"
@@ -182,13 +191,16 @@ histogram(stepsTot$TotNoSteps, breaks=h1breaks, scales=list(y=list(at=h1yat),
             type="count", col=rgb(0/255, 0/255, 139/255, 0.65))
 ```
 
+<img src="PA1_template_files/figure-html/histogram_1-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 <center> **Figure 1:** Histogram of the total number of steps taken per day. </center>  
 
 #### 3. Calculate and report the mean and median of the total number of steps taken per day.  
 
 The mean and median of the total number of steps aggregated by date were calculated, then rounded to the nearest whole step for reporting.
 
-```{r average_original, cache=TRUE}
+
+```r
 # round to the nearest step
 stepsMean <- mean(stepsTot$TotNoSteps, na.rm=TRUE)
 stepsIQR25<- quantile(stepsTot$TotNoSteps, na.rm=TRUE)[[2]]
@@ -202,15 +214,16 @@ stepsIQR25.f <- fmt_rounded_big_mark(stepsIQR25)
 stepsIQR75.f <- fmt_rounded_big_mark(stepsIQR75)
 ```
 
-The mean of the total number of steps taken per day is **`r stepsMean.f`**.  
-The median of the total number of steps taken per day is **`r stepsMedian.f`**.  
+The mean of the total number of steps taken per day is **10,766**.  
+The median of the total number of steps taken per day is **10,765**.  
 
 ***
 
 ### What is the average daily activity pattern?  
 #### 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
 
-```{r average_interval, cache=TRUE}
+
+```r
 # average number of steps taken, across all days, by 5-minute interval
 # excluding interval groups where all step returns are NA
 stepsAvrg <- aggregate(steps ~ interval, data=activity, FUN=mean, na.rm=TRUE, na.action = na.omit)
@@ -224,7 +237,8 @@ Time intervals were derived from row index to provide a uniform scale, as the ac
 <!-- comment: Add hyper link) --> 
 <a name="Figure 2"></a>
 
-```{r plot_1, cache=TRUE}
+
+```r
 # plot average number of steps taken, by 5-minute interval, across all days
 # using interval index (row name), to generate x-axis scale
 p1x <- "5-minute interval"
@@ -237,12 +251,15 @@ with(stepsAvrg, plot(iint, AvrgNoSteps, type = "l", ylab=p1y, xlab=p1x, xlim = c
 axis(side=2, las=2)
 ```
 
+<img src="PA1_template_files/figure-html/plot_1-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 <center> **Figure 2:** Time series showing the average (mean) number of steps taken (averaged across all days), by 5-minute interval. </center>  
 
 
 #### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r max_interval, cache=TRUE}
+
+```r
 # extract interval with max average no. of steps, rounded to nearest step
 imaxsteps <- stepsAvrg[stepsAvrg$AvrgNoSteps == max(stepsAvrg$AvrgNoSteps),]
 imaxsteps[2] <- round(imaxsteps[1,2],0)
@@ -256,10 +273,9 @@ irangelim <- imaxsteps[1] + 5
 # format the time interval as time [24-hour time]
 istart.f <- fmt_interval(imaxsteps[1,1])
 iend.f <- fmt_interval(imaxsteps[1] + 5)
-
 ```
 
-The **`r ivalno` th** 5-minute interval (**`r istart.f`** to **`r iend.f`**), averaged across all the days in the dataset, contains the maximum number of steps (**`r imaxsteps[1,2]`**).  
+The **104 th** 5-minute interval (**8:35 am** to **8:40 am**), averaged across all the days in the dataset, contains the maximum number of steps (**206**).  
 
 ***
 
@@ -271,7 +287,8 @@ Note that there are a number of days/intervals where there are missing values (c
 
 #### 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs).
 
-```{r count_missing, cache=TRUE}
+
+```r
 # count missing values
 totnas <- sum(is.na(activity))
 totrows <- nrow(activity)
@@ -284,7 +301,7 @@ totnas.f <- fmt_rounded_big_mark(totnas)
 totrows.f <- fmt_rounded_big_mark(totrows)
 ```
 
-The total number of missing values (rows containing NAs) in the activity dataset = **`r totnas.f`** (**`r pcnas`%**) of **`r totrows.f`** observations.  
+The total number of missing values (rows containing NAs) in the activity dataset = **2,304** (**13%**) of **17,568** observations.  
 
 #### 2. Devise a strategy for filling in all of the missing values in the dataset. 
 
@@ -300,7 +317,8 @@ The strategy does not need to be sophisticated. For example, you could use the m
 
 #### 3. Create a new dataset from the original dataset, with the missing data filled in.
 
-```{r impute_missing, cache=TRUE}
+
+```r
 # build index for intervals
 impiint <- rep(seq(1,288,1),61)
 impiint <- (impiint -1 ) *5
@@ -325,18 +343,17 @@ impactivity <- merge(activity, stepsAvrgDate, by.x=c("day","impiint"),
 # else with original value 
 impactivity$impsteps <- mapply(FUN = function(x, y) ifelse(is.na(x) == TRUE,y,x), 
                             impactivity$steps, round(impactivity$avgNoSteps,0))
-
 ```
 
 #### 4.1 Make a histogram of the total number of steps taken each day.
 
 Calculate the total number of steps taken per day for data including imputed values for missing observations.
 
-```{r aggregate_imputed, cache=TRUE}
+
+```r
 # Calculate the total number of steps taken per day on imputed dataset
 impstepsTot <- aggregate(impsteps ~ date, data=impactivity, FUN=sum, na.rm=TRUE, na.action = na.omit)
 colnames(impstepsTot) <- c("Date","TotNoImpSteps")
-
 ```
 
 Lattice is used to generate a histogram plot showing the distribution of the mean number of steps taken per day, following the replacement of missing observations with imputed values. 
@@ -345,7 +362,8 @@ Lattice is used to generate a histogram plot showing the distribution of the mea
 <a name="Figure 3"></a>
 
 
-```{r histogram_2, cache=TRUE}
+
+```r
 # generate histogram plot and store 
 h2x <- "Number of Steps"
 h2y <- "Frequency"
@@ -357,13 +375,16 @@ histogram(impstepsTot$TotNoImpSteps, breaks=h2breaks, scales=list(y=list(at=h2ya
             type="count", col=rgb(0/255, 0/255, 139/255, 0.65))
 ```
 
+<img src="PA1_template_files/figure-html/histogram_2-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 <center> **Figure 3:** Histogram of the total number of steps taken per day, following imputation of missing observations. </center>  
 
 
 #### 4.2 Calculate and report the mean and median of the total number of steps taken per day.
 
 
-```{r average_imputed, cache=TRUE}
+
+```r
 # round to the nearest step
 impStepsMean <- mean(impstepsTot$TotNoImpSteps, na.rm=TRUE)
 impStepsIQR25 <- quantile(impstepsTot$TotNoImpSteps, na.rm=TRUE)[[2]]
@@ -377,18 +398,18 @@ impStepsIQR25.f <- fmt_rounded_big_mark(impStepsIQR25)
 impStepsIQR75.f <- fmt_rounded_big_mark(impStepsIQR75)
 ```
 
-The mean number steps taken per day, following imputation of missing observations, is **`r impStepsMean.f`**.  
-The median number steps taken per day, following imputation of missing observations, is **`r impStepsMedian.f`**.  
+The mean number steps taken per day, following imputation of missing observations, is **10,821**.  
+The median number steps taken per day, following imputation of missing observations, is **11,015**.  
 
 
 #### 4.3  Do the mean and median values, following imputation of missing values, differ from the estimates from the first part of the assignment? 
 
-```{r diffs, cache=TRUE}
+
+```r
 # derive % differences between NA excluded and NA imputed analysis
 obsdiff.f  <- fmt_rounded_pc(totrows, totnonnas, diff=TRUE)
 meandiff.f <- fmt_rounded_pc(impStepsMean, stepsMean, diff=TRUE)
 meddiff.f  <- fmt_rounded_pc(impStepsMedian, stepsMedian, diff=TRUE)
-
 ```
 
 Estimates of central tendency for activity levels determined with missing value exclusion, and with missing value imputation are presented in Table 1 (below).
@@ -402,30 +423,31 @@ Estimates of central tendency for activity levels determined with missing value 
 
 |Data                        | Excluding NAs     | With Imputed NAs     | Diff  (%)         |
 |----------------------------|-------------------|----------------------|-------------------|
-|*No. of observations*       | `r totnonnas.f`   | `r totrows.f`        | (`r obsdiff.f`%)  |
-|*[No. of NAs/ Imputed obs]* | NA                | [ `r  totnas.f`]     | NA / (`r pcnas`%) |
-|*Mean no. steps per day*    | `r stepsMean.f`   | `r impStepsMean.f`   | (`r meandiff.f`%) |
-|*Median no. steps per day*  | `r stepsMedian.f` | `r impStepsMedian.f` | (`r meddiff.f`%)  |
-|*Inter Quartile Range*      | (`r stepsIQR25.f` - `r stepsIQR75.f`)  | (`r impStepsIQR25.f` - `r impStepsIQR75.f`)      |  NA  |
+|*No. of observations*       | 15,264   | 17,568        | (15%)  |
+|*[No. of NAs/ Imputed obs]* | NA                | [ 2,304]     | NA / (13%) |
+|*Mean no. steps per day*    | 10,766   | 10,821   | (1%) |
+|*Median no. steps per day*  | 10,765 | 11,015 | (2%)  |
+|*Inter Quartile Range*      | (8,841 - 13,294)  | (8,918 - 12,811)      |  NA  |
 
 
-The mean number of steps taken per day, following imputation of missing observations, has increased from **`r stepsMean.f`** to **`r impStepsMean.f`**.  
-The median number of steps taken per day, following imputation of missing observations, has increased from **`r stepsMedian.f`** to **`r impStepsMedian.f`**.  
+The mean number of steps taken per day, following imputation of missing observations, has increased from **10,766** to **10,821**.  
+The median number of steps taken per day, following imputation of missing observations, has increased from **10,765** to **11,015**.  
 
 
 #### 4.4 What is the impact of imputing missing data on the estimates of the total daily number of steps?  
 
 ##### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r imp_average_interval, cache=TRUE}
+
+```r
 # average number of steps taken, across all days, by 5-minute interval for 
 # data with imputed missing values
 impStepsAvrg <- aggregate(impsteps ~ impiint, data=impactivity, FUN=mean, 
                           na.rm=TRUE, na.action = na.omit)
 colnames(impStepsAvrg) <- c("Interval","AvrgNoSteps")
-
 ```
 
-```{r imp_max_interval, cache=TRUE}
+
+```r
 # extract interval with max average no. of steps, rounded to nearest step
 impimaxsteps <- impStepsAvrg[impStepsAvrg $AvrgNoSteps == max(impStepsAvrg$AvrgNoSteps),]
 impimaxsteps[2] <- round(impimaxsteps[1,2],0)
@@ -439,10 +461,9 @@ impirangelim <- impimaxsteps[1] + 5
 # format the time interval as time [24-hour time]
 impistart.f <- fmt_interval(impimaxsteps[1,1])
 impiend.f <- fmt_interval(impimaxsteps[1] + 5)
-
 ```
 
-The **`r impivalno` th** 5-minute interval (**`r impistart.f`** to **`r impiend.f`**), averaged across all the days in the dataset, contains the maximum number of steps (**`r impimaxsteps[1,2]`**).  
+The **104 th** 5-minute interval (**5:15 am** to **5:20 am**), averaged across all the days in the dataset, contains the maximum number of steps (**209**).  
 
 
 ***
@@ -454,7 +475,8 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 #### 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.  
 
 
-```{r gen_factors, cache=TRUE}
+
+```r
 # create factor with levels "weekday" and "weekend" and assign to new variable
 impactivity$dow <- as.factor(sapply (FUN = function(x) 
     ifelse(x %in% c("Saturday","Sunday"), "weekend", "weekday"), impactivity$day))
@@ -467,7 +489,8 @@ See the [README](https://github.com/ofcoursera/RepData_PeerAssessment1/blob/mast
 Derive mean of steps aggregated on time interval and day of the week (weekday, weekend).  
 
 
-```{r aggregate_factors, cache=TRUE}
+
+```r
 # Aggregate imputed number of steps by day of the week and 5-minute interval
 impStepsAvrgDow <- aggregate(impsteps ~ dow + impiint, data=impactivity, FUN=mean)
 ```
@@ -479,7 +502,8 @@ A plot was generated using lattice, showing the number of steps by interval for 
 <!-- comment: Add hyper link) --> 
 <a name="Figure 4"></a>
 
-```{r plot2, cache=TRUE}
+
+```r
 # generate lattice plot
 p2x <- "5-minute interval"
 p2y <- "Number of steps"
@@ -487,8 +511,9 @@ p2y <- "Number of steps"
 xyplot(impStepsAvrgDow$impsteps~impStepsAvrgDow$impiint | factor(impStepsAvrgDow$dow), 
        type = "l", layout=c(1,2), lwd=1.5, xlab=p2x, ylab=p2y,
        col=rgb(0/255, 0/255, 139/255, 0.65))
-
 ```
+
+<img src="PA1_template_files/figure-html/plot2-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 
 <center> **Figure 4:** Time series plot comparing weekend to weekday averages, following imputation of missing observations, for the number of steps taken per 5-minute interval. </center>
@@ -500,8 +525,8 @@ xyplot(impStepsAvrgDow$impsteps~impStepsAvrgDow$impiint | factor(impStepsAvrgDow
 #### 1)  What are the mean and median total number of steps taken per day?
 The mean and median of the total number of steps taken per day:  
 
--   with NA exclusions: mean = *`r stepsMean.f`*; median = *`r stepsMedian.f`* [Figure 1](#Figure 1)  
--   with NA imputation: mean = *`r impStepsMean.f`*; median = *`r impStepsMedian.f`* [Figure 3](#Figure 3)  
+-   with NA exclusions: mean = *10,766*; median = *10,765* [Figure 1](#Figure 1)  
+-   with NA imputation: mean = *10,821*; median = *11,015* [Figure 3](#Figure 3)  
 
 #### 2)  What is the average daily activity pattern?
 The average daily activity pattern begins at around 5:23 am, peaking between 8:10 am and 9:13 am, then fluctuates over the remainder of the day and early evening, with a tail off from around 9:34 pm until midnight, when activity stops [Figure 2](#Figure 2). 
@@ -520,11 +545,11 @@ Activity levels:
 
 The maximum number of steps, averaged across all days in the dataset:
 
-- with NA exclusions: interval *`r ivalno` th*; time *`r istart.f`* to *`r iend.f`*; max steps *`r imaxsteps[1,2]`* [Figure 2](#Figure 2)
-- with NA imputation: interval *`r impivalno` th*; time *`r impistart.f`* to *`r impiend.f`*; max steps *`r impimaxsteps[1,2]`*    
+- with NA exclusions: interval *104 th*; time *8:35 am* to *8:40 am*; max steps *206* [Figure 2](#Figure 2)
+- with NA imputation: interval *104 th*; time *5:15 am* to *5:20 am*; max steps *209*    
 
 #### 4) What are the total number of missing values?
-- The total number of missing values: *`r totnas.f`*; (*`r pcnas`%*) of *`r totrows.f`* observations.
+- The total number of missing values: *2,304*; (*13%*) of *17,568* observations.
 
 #### 5)  Does imputation affect the mean and median total number of steps taken per day?
 
